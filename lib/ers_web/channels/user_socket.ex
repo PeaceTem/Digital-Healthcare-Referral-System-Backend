@@ -10,7 +10,7 @@ defmodule ErsWeb.UserSocket do
     {:ok, claims} = Auth.verify_token(token)
 
     case Ers.Accounts.get_user_by_email(claims["email"]) do
-      {:ok, user} ->
+      user ->
         {:ok, assign(socket, :user, user)}
 
       _ ->
@@ -18,5 +18,6 @@ defmodule ErsWeb.UserSocket do
     end
   end
 
+  @impl true
   def id(_socket), do: nil
 end

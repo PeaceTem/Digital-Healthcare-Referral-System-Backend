@@ -25,6 +25,8 @@ defmodule Ers.Health.Referral do
     |> cast(attrs, [
       :status,
       :patient_name,
+      :patient_gender,
+      :patient_age,
       :notes,
       :referring_facility_id,
       :receiving_facility_id

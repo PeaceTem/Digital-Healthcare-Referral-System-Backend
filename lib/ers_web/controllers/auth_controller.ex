@@ -12,6 +12,7 @@ defmodule ErsWeb.AuthController do
         json(conn, %{
           token: token,
           user: %{
+            id: user.id,
             email: user.email,
             role: user.role,
             facility_id: user.facility_id

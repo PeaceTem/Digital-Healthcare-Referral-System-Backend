@@ -41,7 +41,7 @@ defmodule ErsWeb.Endpoint do
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
     plug Phoenix.CodeReloader
-    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :ers
+    # plug Phoenix.Ecto.CheckRepoStatus, otp_app: :ers
   end
 
   plug Phoenix.LiveDashboard.RequestLogger,

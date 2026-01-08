@@ -7,6 +7,80 @@ defmodule ErsWeb.ChatChannel do
   end
 
   @impl true
+  def handle_in("conversations:fetch", _payload, socket) do
+    user = socket.assigns.user
+
+    data = Ers.Health.Conversations.get_dashboard_data(user)
+    conversations = %{conversations: data}
+    {:reply, {:ok, conversations}, socket}
+  end
+
+  @impl true
+  def handle_in("referral:create", payload, socket) do
+    user = socket.assigns.user
+
+    attrs = %{
+      status: payload["status"],
+      patient_name: payload["patient_name"],
+      patient_gender: payload["patient_gender"],
+      patient_age: payload["patient_age"],
+      notes: payload["notes"],
+      referring_facility_id: payload["referring_facility_id"],
+      receiving_facility_id: payload["receiving_facility_id"],
+    }
+
+    case Ers.Health.create_referral(attrs) do
+      {:ok, referral} ->
+        # broadcast!(socket, "referral:created", %{
+        #   id: referral.id,
+        #   patient_name: referral.patient_name,
+        #   status: referral.status,
+        #   referring_facility_id: referral.referring_facility_id,
+        #   receiving_facility_id: referral.receiving_facility_id
+        # })
+
+        {:reply, {:ok, referral.id}, socket}
+
+      {:error, changeset} ->
+        {:reply, {:error, %{errors: changeset.errors}}, socket}
+    end
+  end
+
+  def handle_in("message:create", %{"body" => body, "referral_id" => referral_id}, socket) do
+    user = socket.assigns.user
+
+    attrs = %{
+      body: body,
+      referral_id: referral_id,
+      sender_id: user.id
+    }
+
+    case Ers.Communication.create_message(attrs) do
+      {:ok, message} ->
+        # broadcast!(socket, "message:created", %{
+        #   id: message.id,
+        #   body: message.body,
+        #   inserted_at: message.inserted_at,
+        #   sender_id: message.sender_id,
+        #   facility_id: user.facility_id,
+        #   referral_id: message.referral_id
+        # })
+
+        {:noreply, socket}
+
+      {:error, _changeset} ->
+        {:reply, {:error, %{reason: "failed"}}, socket}
+    end
+  end
+
+  @impl true
+  def handle_in("conversations:testing", _payload, socket) do
+    user = socket.assigns.user
+
+    {:reply, {:ok, "Working like Kilishi!"}, socket}
+  end
+
+  @impl true
   def handle_in("message:new", %{"body" => body}, socket) do
     user = socket.assigns.user
 
@@ -15,6 +89,29 @@ defmodule ErsWeb.ChatChannel do
       sender_id: user.id,
       sender_name: user.name,
       inserted_at: DateTime.utc_now()
+    })
+
+    {:noreply, socket}
+  end
+
+  # =========================
+  # NEW REFERRAL
+  # =========================
+  @impl true
+  def handle_in("referral:new", referral_params, socket) do
+    user = socket.assigns.user
+
+    {:ok, referral} =
+      Referrals.create_referral(
+        Map.put(referral_params, "created_by_id", user.id)
+      )
+
+    broadcast!(socket, "referral:created", %{
+      id: referral.id,
+      patient_name: referral.patient_name,
+      from_facility_id: referral.from_facility_id,
+      to_facility_id: referral.to_facility_id,
+      status: referral.status
     })
 
     {:noreply, socket}

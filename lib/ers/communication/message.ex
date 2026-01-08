@@ -9,7 +9,7 @@ defmodule Ers.Communication.Message do
     field :body, :string
 
     belongs_to :referral, Ers.Health.Referral
-    belongs_to :sender, Ers.Accounts.User
+    belongs_to :sender, Ers.Accounts.User, type: :integer
 
     timestamps()
   end

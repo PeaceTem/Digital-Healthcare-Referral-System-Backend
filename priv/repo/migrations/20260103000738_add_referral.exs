@@ -33,7 +33,7 @@ defmodule Ers.Repo.Migrations.AddReferral do
           null: false
 
       add :sender_id,
-          references(:users),
+          references(:users, type: :integer),
           null: false
 
       timestamps()

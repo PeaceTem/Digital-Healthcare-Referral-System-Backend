@@ -7,7 +7,8 @@ defmodule Ers.Plugs.AuthPipeline do
   def call(conn, _opts) do
     with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
         {:ok, claims} <- Auth.verify_token(token),
-        {:ok, user} <- Ers.Accounts.get_user_by_email(claims["email"])
+        _ <- IO.inspect(claims, label: "Verified Claims"),
+        user <- Ers.Accounts.get_user_by_email(claims["email"])
         do
       assign(conn, :current_user, user)
     else

@@ -6,7 +6,7 @@ defmodule Ers.Auth do
     default_claims(
       # issuer: "ers",
       skip: [:aud, :exp],
-      default_exp: 60 * 60 * 24 # 24 hours
+      default_exp: 60 * 60 * 3000 # 24 hours
     )
   end
 
