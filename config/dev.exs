@@ -2,10 +2,10 @@ import Config
 
 # Configure your database
 config :ers, Ers.Repo,
-  username: "postgres",
-  password: "#factorial#",
+  username: System.get_env("DB_USER"),
+  password: System.get_env("DB_PASSWORD"),
   hostname: "localhost",
-  database: "ers_dev",
+  database: System.get_env("DB_NAME"),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10 # what is the meaning of this sef.
