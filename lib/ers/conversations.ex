@@ -3,7 +3,7 @@ defmodule Ers.Health.Conversations do
   alias Ers.Repo
 
   alias Ers.Health.{Facility, Referral}
-
+  alias Ers.Communication.Message
   @epoch ~N[1970-01-01 00:00:00]
 
 
@@ -19,7 +19,8 @@ defmodule Ers.Health.Conversations do
             where:
                 r.referring_facility_id == ^phc_facility_id or
                 r.receiving_facility_id == ^phc_facility_id,
-            preload: [:messages]
+            preload: [messages: ^from(m in Message, order_by: [desc: m.inserted_at])],
+            order_by: [desc: r.inserted_at]
             )
             |> Repo.all()
 
